@@ -4,10 +4,10 @@ An n8n community node that retrieves a task-matched **cognitive operation** from
 
 Each operation in the Ejentum library (679 of them, organized across four harnesses) is engineered in **two layers**:
 
-- a **natural-language procedure** the model can read, and
-- an **executable reasoning topology**: a graph-logic DAG (`Sn` steps, `Gn{...}` gates, `FORK/JOIN` for parallel branches, `LOOP` for convergence, `M{...}` meta-cognitive reflection nodes that let the model exit the graph to self-observe and `RE-ENTER`, and `FREEFORM` escape blocks for when the prescribed path stops fitting the territory).
+- a **natural-language procedure** the model can read, naming the steps to take and the failure pattern to refuse, and
+- an **executable reasoning topology**: a graph-shaped plan over those steps. The plan names explicit decision points where the model branches, parallel branches that run and rejoin, bounded loops that run until convergence, named meta-cognitive moments where the model is asked to stop, look at its own working, and re-enter at a specific step, and escape paths for when the prescribed plan stops fitting the task at hand.
 
-The natural-language layer tells the model *what* to do. The topology layer pins down *how* the steps connect, where to gate, where to loop, where to stop and look at itself. Together they act as a persistent attention anchor that survives long context windows and multi-turn execution chains — the conditions under which a model's own reasoning typically decays.
+The natural-language layer tells the model *what* to do. The topology layer pins down *how* those steps connect: where to decide, where to loop, where to stop and look at itself. Together they act as a persistent attention anchor that survives long context windows and multi-turn execution chains, which is precisely where a model's own reasoning template typically decays.
 
 [Why](#why-this-node-exists) • [Installation](#installation) • [Operations](#operations) • [Worked example](#worked-example-what-actually-gets-injected) • [Credentials](#credentials) • [Compatibility](#compatibility) • [Usage](#usage) • [Resources](#resources)
 
@@ -35,23 +35,23 @@ The **Ejentum** node appears in the node picker.
 
 ## Operations
 
-One node, four operations, each mapping to a harness:
+One node, four operations, each mapping to a harness. Each harness is organized into cognitive domains, so the library is not a flat list of 679 prompts but a structured map: the retrieval honors both the harness and the domain within it.
 
 | Operation | Best for | Library size |
 |---|---|---|
-| **Reasoning Harness** | Analytical, diagnostic, planning, multi-step questions | 311 operations |
-| **Code Harness** | Code generation, review, refactoring, debugging | 128 operations |
-| **Anti-Deception Harness** | Prompts that pressure the model to validate, certify, or soften an honest assessment | 139 operations |
-| **Memory Harness** | Sharpening an observation already formed about cross-turn drift (filter-oriented, not write-oriented) | 101 operations |
+| **Reasoning Harness** | Analytical, diagnostic, planning, multi-step tasks spanning abstraction, time, causality, simulation, spatial, and metacognition | 311 operations |
+| **Code Harness** | Code generation, review, refactoring, and debugging across the software-engineering layer | 128 operations |
+| **Anti-Deception Harness** | Prompts that pressure the model to validate, certify, or soften an honest assessment, spanning sycophancy, hallucination, deception, adversarial framing, judgment, and executive control | 139 operations |
+| **Memory Harness** | Sharpening an observation already formed about cross-turn drift across the perception layer (filter-oriented, not write-oriented) | 101 operations |
 
 Inputs (all four operations):
 
-- **Query** — short description of the task the downstream LLM is about to perform. The harness uses this to retrieve the best-matched operation. Example: `investigate why our nightly ETL job has started failing intermittently over the past two weeks`.
+- **Query**: a short description of the task the downstream LLM is about to perform. The harness uses this to retrieve the best-matched operation. Example: `investigate why our nightly ETL job has started failing intermittently over the past two weeks`.
 
 Outputs:
 
-- **Scaffold String** (default) — returns `{ mode, query, scaffold }`. Drop `{{ $json.scaffold }}` directly into the next LLM's system prompt.
-- **Full Response** — full JSON payload. Use when you want to parse individual blocks downstream.
+- **Scaffold String** (default): returns `{ mode, query, scaffold }`. Drop `{{ $json.scaffold }}` directly into the next LLM's system prompt.
+- **Full Response**: returns the full JSON payload. Use when you want to parse individual blocks downstream.
 
 ## Worked example: what actually gets injected
 
