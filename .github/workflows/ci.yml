@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Lint (prepublish strict)
+        run: npx eslint -c .eslintrc.prepublish.js nodes credentials package.json
+
+      - name: Build
+        run: npm run build
+
+      - name: Verify tarball contents
+        run: |
+          npm pack --dry-run 2>&1 | tee pack.log
+          for required in \
+            "dist/credentials/EjentumApi.credentials.js" \
+            "dist/nodes/Ejentum/Ejentum.node.js" \
+            "dist/nodes/Ejentum/ejentum.svg"; do
+            if ! grep -q "$required" pack.log; then
+              echo "::error::Required file missing from tarball: $required"
+              exit 1
+            fi
+          done

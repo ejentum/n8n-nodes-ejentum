@@ -1,0 +1,66 @@
+{
+  "name": "n8n-nodes-ejentum",
+  "version": "0.1.0",
+  "description": "n8n community node for the Ejentum Reasoning Harness. Pulls a task-matched cognitive scaffold (reasoning, code, anti-deception, or memory) from a library of 679 engineered abilities and injects it into the LLM step that follows, catching the shortcuts that ship as confidently-wrong answers.",
+  "keywords": [
+    "n8n-community-node-package",
+    "ejentum",
+    "reasoning-harness",
+    "agentic-ai",
+    "llm",
+    "anti-deception",
+    "cognitive-scaffold",
+    "ai"
+  ],
+  "license": "MIT",
+  "author": {
+    "name": "Ejentum",
+    "email": "info@ejentum.com"
+  },
+  "homepage": "https://ejentum.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ejentum/n8n-nodes-ejentum.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ejentum/n8n-nodes-ejentum/issues"
+  },
+  "engines": {
+    "node": ">=20.15"
+  },
+  "main": "index.js",
+  "scripts": {
+    "build": "npx rimraf dist && tsc && gulp build:icons",
+    "dev": "tsc --watch",
+    "format": "prettier nodes credentials --write",
+    "lint": "eslint nodes credentials package.json",
+    "lintfix": "eslint nodes credentials package.json --fix",
+    "prepublishOnly": "npm run build && npm run lint -c .eslintrc.prepublish.js nodes credentials package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "n8n": {
+    "n8nNodesApiVersion": 1,
+    "credentials": [
+      "dist/credentials/EjentumApi.credentials.js"
+    ],
+    "nodes": [
+      "dist/nodes/Ejentum/Ejentum.node.js"
+    ]
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@typescript-eslint/parser": "^7.15.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-n8n-nodes-base": "^1.16.3",
+    "gulp": "^5.0.0",
+    "n8n-workflow": "*",
+    "prettier": "^3.3.2",
+    "rimraf": "^5.0.7",
+    "typescript": "^5.5.3"
+  },
+  "peerDependencies": {
+    "n8n-workflow": "*"
+  }
+}

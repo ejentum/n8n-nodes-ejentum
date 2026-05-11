@@ -1,0 +1,18 @@
+{
+	"node": "n8n-nodes-base.ejentum",
+	"nodeVersion": "1.0",
+	"codexVersion": "1.0",
+	"categories": ["AI", "Utility"],
+	"resources": {
+		"primaryDocumentation": [
+			{
+				"url": "https://ejentum.com/docs/api_reference"
+			}
+		],
+		"credentialDocumentation": [
+			{
+				"url": "https://ejentum.com/docs/api_reference"
+			}
+		]
+	}
+}
