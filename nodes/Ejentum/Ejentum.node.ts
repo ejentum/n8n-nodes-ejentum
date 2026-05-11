@@ -22,7 +22,7 @@ export class Ejentum implements INodeType {
 		version: 1,
 		subtitle: '={{$parameter["operation"]}}',
 		description:
-			'Pull a task-matched cognitive scaffold from the Ejentum Reasoning Harness before an LLM step. Four harnesses cover reasoning, code, anti-deception, and memory.',
+			'Retrieve a task-matched cognitive operation from the Ejentum Reasoning Harness and inject it into the next LLM step. Each operation is engineered in two layers: a natural-language procedure plus an executable reasoning topology (graph DAG with gates, parallel branches, and meta-cognitive exits). Hardens reasoning against decay on complex tasks and long sessions. Four harnesses: reasoning, code, anti-deception, memory.',
 		defaults: {
 			name: 'Ejentum',
 		},
@@ -75,7 +75,7 @@ export class Ejentum implements INodeType {
 						value: 'reasoning',
 						action: 'Get a reasoning scaffold',
 						description:
-							'Use before analytical, diagnostic, planning, or multi-step tasks. The scaffold returns a named failure pattern, an executable procedure, a target pattern, suppression vectors, and a falsification test.',
+							'Use before analytical, diagnostic, planning, or multi-step tasks. Returns a named failure pattern, a natural-language procedure, an executable reasoning topology (graph DAG), a target pattern, a falsification test, and amplify/suppress signals. 311 operations in the library.',
 					},
 				],
 				default: 'reasoning',

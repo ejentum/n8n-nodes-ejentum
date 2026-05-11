@@ -16,15 +16,15 @@ Copy-paste pack for submitting `n8n-nodes-ejentum` to <https://creators.n8n.io> 
 
 ## Short description (~150 chars)
 
-Call the Ejentum Reasoning Harness before an LLM step. Four operations: reasoning, code, anti-deception, memory. Marked usableAsTool for the n8n AI Agent.
+Inject a task-matched cognitive operation (natural-language procedure + executable reasoning topology) into the LLM step. Four harnesses, usableAsTool.
 
 ## Long description (~500 chars)
 
-The Ejentum node retrieves a task-matched cognitive scaffold from a library of 679 engineered cognitive operations and injects it into the next LLM step. Four harnesses cover reasoning, code, anti-deception, and memory. Each call returns a structured scaffold (named failure pattern, executable procedure, suppression vectors, falsification test) that the downstream LLM ingests before it writes its first token. Use it where RAG and fine-tuning cannot help: not what the model knows, how it reasons.
+Retrieves a task-matched cognitive operation from the Ejentum Reasoning Harness and injects it into the LLM step that follows. Each operation in the 679-strong library is engineered in two layers: a natural-language procedure the model reads, plus an executable reasoning topology (graph DAG with decision gates, parallel branches, bounded loops, and meta-cognitive exit nodes that let the model self-observe and re-enter). The topology acts as a persistent attention anchor that survives long context windows and multi-turn execution chains, hardening reasoning against decay on complex tasks. Four harnesses (reasoning, code, anti-deception, memory) cover the four conditions under which models predictably fail.
 
 ## Tagline / one-liner
 
-Reasoning Harness for n8n: stop your LLM from shipping confidently wrong answers.
+Reasoning Harness for n8n: a task-matched cognitive operation, engineered as both procedure and graph, injected before the LLM writes its first token.
 
 ## Categories
 
