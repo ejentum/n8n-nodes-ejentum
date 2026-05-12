@@ -9,3 +9,7 @@ dist
 .tsbuildinfo
 .vscode
 .idea
+
+# Local icon-trace source files (the canonical artifact is the traced SVG)
+ejentum_icon.svg.png
+*.icon.png

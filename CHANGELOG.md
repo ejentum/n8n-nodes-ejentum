@@ -2,6 +2,23 @@
 
 All notable changes to `n8n-nodes-ejentum` are documented here. This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.3] - 2026-05-12
+
+### Changed
+
+- **Icon**: replaced the 1254×1254 full-logo SVG (black background + red E-mark) with a 1024×1024 icon-optimized variant (transparent background, single red path traced from a 2D-rendered glyph). The old logo's black square clashed with n8n's dark canvas at small node-icon sizes (~60×60); the new transparent variant lets the canvas background show through and the red mark reads clean.
+- **Output Format parameter removed**. The node now always returns `{mode, query, response: [{<mode>: scaffold}]}`. The previous Scaffold String / Full Response dropdown was needless choice: the API response is already cleanly labeled, and downstream nodes can address the scaffold via expression. The `HarnessResponseItem` interface and dead type casts in `_run` were removed along with the parameter.
+- **Operation action labels** changed from `Get a/an <X> scaffold` to `Get <X> harness`. Blind-evaluated across Claude Sonnet 4.5, GPT-4o, and Gemini 2.5 Pro (position-randomized per call): all three voted unanimously for "harness" over "injection", citing that "harness" describes the structured object being retrieved while "injection" describes the downstream use.
+- **Operation descriptions** rewritten via the same blind-eval methodology. 4 operations × 2 variants (old marketing-style vs new uniform trigger+coverage shape) × 3 models. Final descriptions are a HYBRID of the winners per operation:
+  - `reasoning_harness` (new uniform won 3/0): `Use before analytical, diagnostic, planning, or multi-step tasks across abstraction, time, causality, simulation, spatial, and metacognition.`
+  - `code_harness` (old kept 3/0): `Use before generating, reviewing, refactoring, or debugging code. Names the typical failure pattern, gives an engineering procedure, and lists suppression vectors for the most common LLM coding mistakes.` Specific failure modes (hallucinated APIs, lost edge cases) carry routing signal; abstract "software-engineering layer" lost it.
+  - `anti_deception_harness` (old kept 3/0): `Use when a prompt pressures the model to validate, certify, or soften an honest assessment. Blocks sycophantic capitulation and hallucinated agreement before the response is written.` Specific failure modes beat broad six-sub-layer enumeration for agent routing.
+  - `memory_harness` (new kept 2/1, with Gemini's "does not replace observation" caveat preserved): `Use after you have already noticed something about cross-turn drift, contradiction, or accumulated context in the perception layer. Sharpens an existing observation; does not generate one.`
+
+### Why the hybrid
+
+Frank's "looks like marketing copy" critique on the original Reasoning description was right for THAT operation (the "returns failure pattern, procedure, falsification test..." enumeration was output-shape exposition the agent sees once it calls). But the same pattern failed for Code and Anti-Deception, where the named failure modes were operationally useful routing signal, not marketing. Listing six abstract sub-layers added taxonomic noise without helping the agent match a task. The blind eval surfaced this asymmetry cleanly.
+
 ## [0.1.2] - 2026-05-11
 
 ### Changed

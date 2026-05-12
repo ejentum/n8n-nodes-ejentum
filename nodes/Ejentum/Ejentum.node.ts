@@ -9,10 +9,6 @@ import {
 
 type HarnessMode = 'reasoning' | 'code' | 'anti-deception' | 'memory';
 
-interface HarnessResponseItem {
-	[key: string]: string | undefined;
-}
-
 export class Ejentum implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Ejentum',
@@ -52,30 +48,29 @@ export class Ejentum implements INodeType {
 					{
 						name: 'Anti-Deception Harness',
 						value: 'anti-deception',
-						action: 'Get an anti deception scaffold',
+						action: 'Get anti deception harness',
 						description:
-							'Use when a prompt pressures the model to validate, certify, or soften an honest assessment. The scaffold blocks sycophantic capitulation and hallucinated agreement before the response is written.',
+							'Use when a prompt pressures the model to validate, certify, or soften an honest assessment. Blocks sycophantic capitulation and hallucinated agreement before the response is written.',
 					},
 					{
 						name: 'Code Harness',
 						value: 'code',
-						action: 'Get a code scaffold',
+						action: 'Get code harness',
 						description:
-							'Use before generating, reviewing, refactoring, or debugging code. The scaffold names the typical failure pattern, gives an engineering procedure, and lists suppression vectors for the most common LLM coding mistakes.',
+							'Use before generating, reviewing, refactoring, or debugging code. Names the typical failure pattern, gives an engineering procedure, and lists suppression vectors for the most common LLM coding mistakes.',
 					},
 					{
 						name: 'Memory Harness',
 						value: 'memory',
-						action: 'Get a memory scaffold',
+						action: 'Get memory harness',
 						description:
-							'Use only after you have already noticed something about cross-turn drift, contradiction, or accumulated context. The scaffold sharpens an observation you already formed; it does not replace observation.',
+							'Use after you have already noticed something about cross-turn drift, contradiction, or accumulated context in the perception layer. Sharpens an existing observation; does not generate one.',
 					},
 					{
 						name: 'Reasoning Harness',
 						value: 'reasoning',
-						action: 'Get a reasoning scaffold',
-						description:
-							'Use before analytical, diagnostic, planning, or multi-step tasks. Returns a named failure pattern, a natural-language procedure, an executable reasoning topology (graph DAG), a target pattern, a falsification test, and amplify/suppress signals. 311 operations in the library.',
+						action: 'Get reasoning harness',
+						description: 'Use before analytical, diagnostic, planning, or multi-step tasks across abstraction, time, causality, simulation, spatial, and metacognition',
 					},
 				],
 				default: 'reasoning',
@@ -93,25 +88,6 @@ export class Ejentum implements INodeType {
 				description:
 					'A short description of the task you are about to perform. The harness uses this to retrieve the best-matched cognitive scaffold. Example: "diagnose intermittent 503s under load".',
 			},
-			{
-				displayName: 'Output Format',
-				name: 'outputFormat',
-				type: 'options',
-				options: [
-					{
-						name: 'Scaffold String',
-						value: 'scaffold',
-						description: 'Return only the scaffold text, on a "scaffold" output key. Best for piping directly into an LLM prompt.',
-					},
-					{
-						name: 'Full Response',
-						value: 'full',
-						description: 'Return the full JSON response from the API. Use when you need the raw payload.',
-					},
-				],
-				default: 'scaffold',
-				description: 'How to shape the data returned by this node',
-			},
 		],
 	};
 
@@ -127,9 +103,6 @@ export class Ejentum implements INodeType {
 			try {
 				const mode = this.getNodeParameter('operation', i) as HarnessMode;
 				const rawQuery = this.getNodeParameter('query', i, '') as string;
-				const outputFormat = this.getNodeParameter('outputFormat', i, 'scaffold') as
-					| 'scaffold'
-					| 'full';
 
 				const query = (rawQuery ?? '').trim();
 				if (!query) {
@@ -147,35 +120,14 @@ export class Ejentum implements INodeType {
 					json: true,
 				};
 
-				const response = (await this.helpers.httpRequestWithAuthentication.call(
+				const response = await this.helpers.httpRequestWithAuthentication.call(
 					this,
 					'ejentumApi',
 					requestOptions,
-				)) as HarnessResponseItem[] | HarnessResponseItem | unknown;
-
-				if (outputFormat === 'full') {
-					returnData.push({
-						json: { mode, query, response: response as object },
-						pairedItem: { item: i },
-					});
-					continue;
-				}
-
-				let scaffold: string | undefined;
-				if (Array.isArray(response) && response.length > 0 && typeof response[0] === 'object') {
-					scaffold = (response[0] as HarnessResponseItem)[mode];
-				}
-
-				if (!scaffold) {
-					throw new NodeOperationError(
-						this.getNode(),
-						`Ejentum API returned an unexpected response shape for mode "${mode}". Expected [{ "${mode}": "..." }]; got ${JSON.stringify(response).slice(0, 240)}`,
-						{ itemIndex: i },
-					);
-				}
+				);
 
 				returnData.push({
-					json: { mode, query, scaffold },
+					json: { mode, query, response: response as object },
 					pairedItem: { item: i },
 				});
 			} catch (error) {
