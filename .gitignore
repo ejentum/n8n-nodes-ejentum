@@ -13,3 +13,8 @@ dist
 # Local icon-trace source files (the canonical artifact is the traced SVG)
 ejentum_icon.svg.png
 *.icon.png
+
+# Local icon working files (Bob deliveries, screenshot examples, backups)
+ejentum_icon.svg
+*.jpeg
+*.bobversion

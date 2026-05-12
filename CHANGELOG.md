@@ -2,6 +2,16 @@
 
 All notable changes to `n8n-nodes-ejentum` are documented here. This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.4] - 2026-05-13
+
+### Changed
+
+- **Icon**: shipped the canonical brand mark from the master logo library (the exact vector path used on the website, Gravatar, and every other Ejentum surface). Black rounded-square tile (`rx=220` in a 1254×1254 viewBox), canonical red (`#FB1B27`) E centered and scaled 1.5× to nearly fill the tile horizontally. Replaces the 0.1.3 potrace-from-raster variant, which had slightly thicker strokes as a tracing artifact rather than as a deliberate brand decision. Brand mark, colors, and proportions are now pixel-identical to every other Ejentum surface.
+
+### Why
+
+For an installed n8n community node that users will compare side-by-side with the website, the same path everywhere matters more than slightly thicker strokes. The rounded-square tile is the only platform-specific adaptation: n8n's design language uses rounded tiles for every node, so a sharp-square tile (the canonical container shape elsewhere) would have read as unfinished CSS inside n8n rather than as the brand.
+
 ## [0.1.3] - 2026-05-12
 
 ### Changed
