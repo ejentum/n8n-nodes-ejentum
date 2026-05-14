@@ -11,6 +11,8 @@ The natural-language layer tells the model *what* to do. The topology layer pins
 
 [Why](#why-this-node-exists) • [Installation](#installation) • [Operations](#operations) • [Worked example](#worked-example-what-actually-gets-injected) • [Credentials](#credentials) • [Compatibility](#compatibility) • [Usage](#usage) • [Resources](#resources)
 
+> **MCP alternative.** This native n8n node calls the Ejentum Logic API directly. If you'd rather use n8n's built-in MCP Client node, the same four harness tools are now hosted at `https://api.ejentum.com/mcp` with Bearer auth via your `EJENTUM_API_KEY`. Both routes hit the same Logic API and use the same key; pick whichever fits your workflow style. The native node has tighter n8n integration (action labels, credential vault, expression-friendly outputs); the MCP route is preferable if you're already wiring multiple MCP servers into one workflow.
+
 ## Why this node exists
 
 RAG augments **what the model knows**. Fine-tuning shifts **what the model is**. Neither closes the layer Ejentum closes: **how the model reasons on this specific task, right now, before the first token is generated.**
