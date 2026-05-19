@@ -1,10 +1,12 @@
 import {
+	NodeApiError,
 	NodeOperationError,
 	type IExecuteFunctions,
 	type IHttpRequestOptions,
 	type INodeExecutionData,
 	type INodeType,
 	type INodeTypeDescription,
+	type JsonObject,
 } from 'n8n-workflow';
 
 type HarnessMode = 'reasoning' | 'code' | 'anti-deception' | 'memory';
@@ -31,13 +33,6 @@ export class Ejentum implements INodeType {
 				required: true,
 			},
 		],
-		requestDefaults: {
-			baseURL: '={{$credentials.baseUrl}}',
-			headers: {
-				'Content-Type': 'application/json',
-				Accept: 'application/json',
-			},
-		},
 		properties: [
 			{
 				displayName: 'Operation',
@@ -139,7 +134,10 @@ export class Ejentum implements INodeType {
 					});
 					continue;
 				}
-				throw error;
+				if (error instanceof NodeOperationError) {
+					throw error;
+				}
+				throw new NodeApiError(this.getNode(), error as JsonObject, { itemIndex: i });
 			}
 		}
 

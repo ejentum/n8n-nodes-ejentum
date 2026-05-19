@@ -7,7 +7,7 @@ Copy-paste pack for submitting `n8n-nodes-ejentum` to <https://creators.n8n.io> 
 ## Identity
 
 - **Package name** (npm): `n8n-nodes-ejentum`
-- **Package version**: `0.1.0`
+- **Package version**: `0.1.5`
 - **npm URL**: <https://www.npmjs.com/package/n8n-nodes-ejentum>
 - **GitHub URL**: <https://github.com/ejentum/n8n-nodes-ejentum>
 - **License**: MIT

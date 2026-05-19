@@ -2,6 +2,13 @@
 
 All notable changes to `n8n-nodes-ejentum` are documented here. This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.5] - 2026-05-19
+
+### Fixed
+
+- **HTTP errors are now wrapped in `NodeApiError`** (HIGH, creators.n8n.io manual review). The `execute()` catch block re-threw the raw error from `httpRequestWithAuthentication`, which dropped the HTTP status code, response body, and request URL from what the n8n UI showed the user. The catch now splits by error type: the empty-query `NodeOperationError` passes through unchanged (it is already caller-meaningful and carries its `itemIndex`), and every other error is wrapped in `NodeApiError(this.getNode(), error, { itemIndex })` so a failed request surfaces its full API context. Added `NodeApiError` and the `JsonObject` type to the `n8n-workflow` imports.
+- **Removed the dead `requestDefaults` block** (MEDIUM, creators.n8n.io manual review). `requestDefaults` is consulted only by declarative-routing nodes. This node is programmatic: it defines `execute()` and assembles its own URL, body, and request options, so the block was never read by the runtime. Because it was already inert on the `execute()` path in prior versions, removing it is behavior-neutral: the HTTP request the node sends is byte-identical to `0.1.4`. The credential `test` request keeps its own headers, since credential tests are genuinely declarative and that block is live.
+
 ## [0.1.4] - 2026-05-13
 
 ### Changed
