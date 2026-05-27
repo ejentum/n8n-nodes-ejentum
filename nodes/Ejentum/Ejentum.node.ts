@@ -9,7 +9,15 @@ import {
 	type JsonObject,
 } from 'n8n-workflow';
 
-type HarnessMode = 'reasoning' | 'code' | 'anti-deception' | 'memory';
+type HarnessMode =
+	| 'reasoning'
+	| 'code'
+	| 'anti-deception'
+	| 'memory'
+	| 'adaptive-reasoning'
+	| 'adaptive-code'
+	| 'adaptive-anti-deception'
+	| 'adaptive-memory';
 
 export class Ejentum implements INodeType {
 	description: INodeTypeDescription = {
@@ -20,7 +28,7 @@ export class Ejentum implements INodeType {
 		version: 1,
 		subtitle: '={{$parameter["operation"]}}',
 		description:
-			'Retrieve a task-matched cognitive operation from the Ejentum Reasoning Harness and inject it into the next LLM step. Each operation is engineered in two layers: a natural-language procedure plus an executable reasoning topology (graph DAG with gates, parallel branches, and meta-cognitive exits). Hardens reasoning against decay on complex tasks and long sessions. Four harnesses: reasoning, code, anti-deception, memory.',
+			'Retrieve a task-matched cognitive operation from the Ejentum Reasoning Harness and inject it into the next LLM step. Each operation is engineered in two layers: a natural-language procedure plus an executable reasoning topology (graph DAG with gates, parallel branches, and meta-cognitive exits). Eight modes: four dynamic (reasoning, code, anti-deception, memory) plus four adaptive (adaptive-reasoning, adaptive-code, adaptive-anti-deception, adaptive-memory) that pre-fit the operation to your task via an adapter LLM. Dynamic available on all tiers including the 30-day free trial; adaptive requires Go or Super.',
 		defaults: {
 			name: 'Ejentum',
 		},
@@ -40,6 +48,34 @@ export class Ejentum implements INodeType {
 				type: 'options',
 				noDataExpression: true,
 				options: [
+					{
+						name: 'Adaptive Anti-Deception Harness',
+						value: 'adaptive-anti-deception',
+						action: 'Get adaptive anti deception harness',
+						description:
+							'Same triggers as Anti-Deception, but the operation is rewritten by an adapter LLM to fit the specific integrity dynamic. Detection topology gates are concretized to the exact pressure at play. Requires Go or Super tier.',
+					},
+					{
+						name: 'Adaptive Code Harness',
+						value: 'adaptive-code',
+						action: 'Get adaptive code harness',
+						description:
+							'Same triggers as Code, but the operation is rewritten by an adapter LLM to fit the specific code task. Language, framework, and failure modes are concretized in every step. Requires Go or Super tier.',
+					},
+					{
+						name: 'Adaptive Memory Harness',
+						value: 'adaptive-memory',
+						action: 'Get adaptive memory harness',
+						description:
+							'Same triggers as Memory, but the operation is rewritten by an adapter LLM to fit the specific observation. Perception topology nodes are concretized to the specific signal. Requires Go or Super tier.',
+					},
+					{
+						name: 'Adaptive Reasoning Harness',
+						value: 'adaptive-reasoning',
+						action: 'Get adaptive reasoning harness',
+						description:
+							'Same triggers as Reasoning, but the operation is rewritten by an adapter LLM to fit the specific task. Procedure steps and topology DAG nodes are concretized with task-specific language. Requires Go or Super tier.',
+					},
 					{
 						name: 'Anti-Deception Harness',
 						value: 'anti-deception',
@@ -65,7 +101,8 @@ export class Ejentum implements INodeType {
 						name: 'Reasoning Harness',
 						value: 'reasoning',
 						action: 'Get reasoning harness',
-						description: 'Use before analytical, diagnostic, planning, or multi-step tasks across abstraction, time, causality, simulation, spatial, and metacognition',
+						description:
+							'Use before analytical, diagnostic, planning, or multi-step tasks across abstraction, time, causality, simulation, spatial, and metacognition.',
 					},
 				],
 				default: 'reasoning',
