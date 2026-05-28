@@ -129,7 +129,7 @@ export class Ejentum implements INodeType {
 
 		const credentials = await this.getCredentials('ejentumApi');
 		const baseUrl = ((credentials.baseUrl as string) ?? '').trim() ||
-			'https://ejentum-main-ab125c3.zuplo.app/logicv1/';
+			'https://api.ejentum.com/harness';
 
 		for (let i = 0; i < items.length; i++) {
 			try {
