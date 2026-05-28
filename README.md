@@ -1,155 +1,87 @@
 # n8n-nodes-ejentum
 
-An n8n community node that retrieves a task-matched **cognitive operation** from the [Ejentum](https://ejentum.com) Reasoning Harness and injects it into the LLM step that follows.
+An n8n community node that calls the Ejentum API and returns a task-matched cognitive operation (procedure + topology DAG + cognitive payload) for injection into the LLM step that follows.
 
-Each operation in the Ejentum library (679 of them, organized across four cognitive harnesses each with dynamic and adaptive variants) is engineered in **two layers**:
+One node, eight operations: four dynamic (`Reasoning`, `Code`, `Anti-Deception`, `Memory`) available on all tiers including the 30-day free trial, and four adaptive (`Adaptive Reasoning`, `Adaptive Code`, `Adaptive Anti-Deception`, `Adaptive Memory`) that run an additional adapter LLM step. Adaptive operations require the Go or Super tier.
 
-- a **natural-language procedure** the model can read, naming the steps to take and the failure pattern to refuse, and
-- an **executable reasoning topology**: a graph-shaped plan over those steps. The plan names explicit decision points where the model branches, parallel branches that run and rejoin, bounded loops that run until convergence, named meta-cognitive moments where the model is asked to stop, look at its own working, and re-enter at a specific step, and escape paths for when the prescribed plan stops fitting the task at hand.
+## Install
 
-The natural-language layer tells the model *what* to do. The topology layer pins down *how* those steps connect: where to decide, where to loop, where to stop and look at itself. Together they act as a persistent attention anchor that survives long context windows and multi-turn execution chains, which is precisely where a model's own reasoning template typically decays.
+Follow the [n8n community nodes installation guide](https://docs.n8n.io/integrations/community-nodes/installation/):
 
-[Why](#why-this-node-exists) • [Installation](#installation) • [Operations](#operations) • [Worked example](#worked-example-what-actually-gets-injected) • [Credentials](#credentials) • [Compatibility](#compatibility) • [Usage](#usage) • [Resources](#resources)
-
-> **MCP alternative.** This native n8n node calls the Ejentum API directly. If you'd rather use n8n's built-in MCP Client node, the same eight harness tools are hosted at `https://api.ejentum.com/mcp` with Bearer auth via your `EJENTUM_API_KEY`. Both routes hit the same API and use the same key; pick whichever fits your workflow style. The native node has tighter n8n integration (action labels, credential vault, expression-friendly outputs); the MCP route is preferable if you're already wiring multiple MCP servers into one workflow.
-
-## Why this node exists
-
-RAG augments **what the model knows**. Fine-tuning shifts **what the model is**. Neither closes the layer Ejentum closes: **how the model reasons on this specific task, right now, before the first token is generated.**
-
-Two failure modes drive most production agent regressions:
-
-- **Complexity**: the task has more constraints, edge cases, or interacting variables than the model's default reasoning template can carry. The model collapses to a generic-looking answer that misses the load-bearing constraint.
-- **Reasoning decay over long sessions**: across many turns or a long execution chain, the model drifts. Attention anchors weaken, prior commitments fade, suppression signals stop firing. By turn 30 you are not talking to the model you started with.
-
-Injecting a task-matched cognitive operation before the LLM step works against both: the topology gives the model a structure to ride, the natural-language procedure tells it *what* the structure means, the `Amplify/Suppress` channel tells it which of its own tendencies to lean into and which to block.
-
-## Installation
-
-Follow the [n8n community nodes installation guide](https://docs.n8n.io/integrations/community-nodes/installation/).
-
-1. Open **Settings → Community Nodes**.
-2. Click **Install**.
-3. Enter `n8n-nodes-ejentum`.
-4. Agree to the community-nodes risk acknowledgement and install.
+1. Settings → Community Nodes → Install.
+2. Enter `n8n-nodes-ejentum`.
+3. Confirm the community-nodes risk acknowledgement.
 
 The **Ejentum** node appears in the node picker.
 
-## Operations
-
-One node, eight operations. Four are dynamic (single retrieval, available on all tiers including the 30-day free trial). Four are adaptive (an adapter LLM rewrites the returned procedure and topology to fit the caller's task; require the Go or Super tier).
-
-### Dynamic operations
-
-| Operation | Best for | Library size |
-|---|---|---|
-| **Reasoning** | Analytical, diagnostic, planning, multi-step tasks spanning abstraction, time, causality, simulation, spatial, and metacognition | 311 operations |
-| **Code** | Code generation, review, refactoring, and debugging across the software-engineering layer | 128 operations |
-| **Anti-Deception** | Prompts that pressure the model to validate, certify, or soften an honest assessment, spanning sycophancy, hallucination, deception, adversarial framing, judgment, and executive control | 139 operations |
-| **Memory** | Sharpening an observation already formed about cross-turn drift across the perception layer (filter-oriented, not write-oriented) | 101 operations |
-
-### Adaptive operations
-
-| Operation | When to prefer over the dynamic version |
-|---|---|
-| **Adaptive Reasoning** | High-stakes analytical work where every DAG node should be mapped to your specifics before generation. Cost ~2-3s vs ~1s. |
-| **Adaptive Code** | Security-critical reviews, refactor-heavy diffs, or any code work where every verification step should be concretized. |
-| **Adaptive Anti-Deception** | When the stakes of a soft or sycophantic answer are high; detection topology gates concretized to the exact pressure or framing trap at play. |
-| **Adaptive Memory** | When the dynamic memory operation's general scaffold is not sharp enough for the perception being formed. |
-
-Inputs (all eight operations):
-
-- **Query**: a short description of the task the downstream LLM is about to perform. The harness uses this to retrieve the best-matched operation. Example: `investigate why our nightly ETL job has started failing intermittently over the past two weeks`.
-
-Outputs:
-
-- **Injection String** (default): returns `{ mode, query, injection }`. Drop `{{ $json.injection }}` directly into the next LLM's system prompt.
-- **Full Response**: returns the full JSON payload. Use when you want to parse individual blocks downstream.
-
-## Worked example: what actually gets injected
-
-Suppose your workflow asks the model to diagnose an intermittent failure:
-
-> *Query*: `investigate why our nightly ETL job has started failing intermittently over the past two weeks; nothing in the code or schema has changed`
-
-The Reasoning operation returns this injection. Both layers are visible inside it: the `[PROCEDURE]` block is the natural-language layer, the `[REASONING TOPOLOGY]` block is the graph-logic layer.
-
-```
-[NEGATIVE GATE]
-The server's response time was accepted as average, despite a suspicious
-rhythm break in its timing pattern.
-
-[PROCEDURE]
-Step 1: Establish baseline timing profiles by extracting historical
-durations and intervals for each event type. Step 2: Compare each observed
-timing against its baseline and compute deviation magnitude. Step 3:
-Classify anomalies as too fast, too slow, too early, or too late, and rank
-by severity. Step 4: Do not dismiss timing deviations without
-investigation. Never normalize anomalous timing as acceptable drift. Step
-5: If deviation exceeds two standard deviations, probe root cause by
-tracing upstream dependencies. If within tolerance, validate against
-context. Flag confirmed anomalies with measured deviation and verify the
-baseline was appropriate. Apply temporal anomaly detection.
-
-[REASONING TOPOLOGY]
-S1:durations -> FIXED_POINT[baselines] -> N{dismiss_timing_deviations_
-without_investigation} -> for_each: S2:compare -> S3:deviation ->
-G1{>2sigma?} --yes-> S4:classify -> S5:probe_cause -> FLAG -> continue --no->
-S6:validate -> continue -> all_checked -> OUT:anomaly_report
-
-[TARGET PATTERN]
-Establish timing baselines by extracting historical response intervals.
-Compare current server response time to this baseline. Classification-
-focused anomaly reveals a rhythm break, indicating a potential security
-context elevation requiring further investigation.
-
-[FALSIFICATION TEST]
-If no event timing is flagged as suspiciously fast or slow relative to
-baseline, temporal anomaly detection was not active: trace the output
-to confirm.
-
-Amplify: timing baseline comparison; anomaly classification; security
-context elevation
-Suppress: average timing acceptance; outlier normalization
-```
-
-Field-by-field, this is what the downstream LLM does with each block:
-
-| Block | Role at the next LLM step |
-|---|---|
-| `[NEGATIVE GATE]` | The specific failure pattern to refuse. The model checks its draft against this *before* committing. |
-| `[PROCEDURE]` | The natural-language steps. Read first, executed in order. |
-| `[REASONING TOPOLOGY]` | The graph of those steps. `Sn` = step, `Gn{?}` = decision gate, `N{...}` = negative anchor active for the whole branch, `for_each` / `LOOP` = bounded iteration, `M{...}` / `FREEFORM` = meta-cognitive exit (the model stops, observes the trace, then `RE-ENTER`s at a named step), `FIXED_POINT[...]` = a quantity held stable across the rest of the branch. The topology survives long context windows in a way prose alone does not. |
-| `[TARGET PATTERN]` | What correct reasoning looks like in one paragraph. Anchors the output shape. |
-| `[FALSIFICATION TEST]` | A check the model runs *after* drafting. If the test fires, the draft was wrong about the task type. |
-| `Amplify:` | Tendencies the model already has that should be turned up for this task. |
-| `Suppress:` | Tendencies that produce the failure mode. The most load-bearing block; the rest of the injection often funnels into this list. |
-
 ## Credentials
 
-Get an Ejentum API key at <https://ejentum.com/pricing>. The 30-day free trial (no card required) includes 1,000 dynamic reasoning calls; adaptive operations require Go or Super.
-
-In n8n, create new **Ejentum API** credentials:
+Create new **Ejentum API** credentials in n8n:
 
 | Field | Value |
 |---|---|
-| API Key | paste your key (starts with `ej_`) |
-| API Base URL | leave default (`https://api.ejentum.com/harness/`) unless self-hosting |
+| API Key | your key (starts with `ej_`) |
+| API Base URL | default `https://api.ejentum.com/harness/` unless self-hosting |
 
-The **Test** button runs a real request against the gateway and confirms the key works.
+The **Test** button issues a real POST against the gateway and confirms the key is valid.
 
-## Compatibility
+Get a key at [ejentum.com/pricing](https://ejentum.com/pricing).
 
-- Tested against n8n `2.9.x` and above.
-- Requires Node.js `>=20.15` on the n8n host.
-- `eslint-plugin-n8n-nodes-base` community + prepublish rule sets pass at publish time.
+## Operations
 
-## Usage
+### Dynamic (all tiers)
 
-The canonical wiring is **Ejentum → LLM**, with the injection flowing into the next system prompt:
+| Operation | Mode string | Library size |
+|---|---|---:|
+| Reasoning | `reasoning` | 311 |
+| Code | `code` | 128 |
+| Anti-Deception | `anti-deception` | 139 |
+| Memory | `memory` | 101 |
+
+### Adaptive (Go or Super tier)
+
+| Operation | Mode string |
+|---|---|
+| Adaptive Reasoning | `adaptive-reasoning` |
+| Adaptive Code | `adaptive-code` |
+| Adaptive Anti-Deception | `adaptive-anti-deception` |
+| Adaptive Memory | `adaptive-memory` |
+
+## Inputs and outputs
+
+### Input parameter (all operations)
+
+- **Query** (string, required): 1-2 sentences describing the task the downstream LLM is about to perform. The harness uses this for retrieval.
+
+### Output format
+
+The node has two output modes selected via a parameter:
+
+| Output mode | Returned JSON |
+|---|---|
+| **Injection String** (default) | `{ "mode": "<mode>", "query": "<query>", "injection": "<text>" }` |
+| **Full Response** | The full upstream payload: `[ { "<mode>": "<text>" } ]` |
+
+In the default mode, drop `{{ $json.injection }}` into the next LLM node's system prompt.
+
+## Wire contract
+
+The node issues:
 
 ```
-Webhook ─► Ejentum (Reasoning operation, query="{{ $json.task }}")
+POST https://api.ejentum.com/harness/
+Headers: Authorization: Bearer <key>, Content-Type: application/json
+Body:    { "query": <string>, "mode": <one of 8 mode strings> }
+Response (200): [ { "<mode>": "<injection string>" } ]
+Response (401|403|429): { "error": "..." }
+```
+
+Full wire contract, field structure of an injection, DAG syntax (token vocabulary used in the topology block), and a canonical dynamic-vs-adaptive comparison on the same query are documented in the [ejentum-mcp README](https://github.com/ejentum/ejentum-mcp#wire-contract). The format is identical across this node and every Ejentum framework shim.
+
+## Canonical wiring
+
+```
+Webhook ─► Ejentum (Reasoning, query="{{ $json.task }}")
             │
             └─► AI Agent / OpenAI Chat / Anthropic / ...
                   System prompt:
@@ -157,22 +89,31 @@ Webhook ─► Ejentum (Reasoning operation, query="{{ $json.task }}")
                   [REASONING CONTEXT]
                   {{ $json.injection }}
                   [END REASONING CONTEXT]
+
                   Now perform the task.
                   """
 ```
 
-For multi-step workflows or long agent loops, place a fresh Ejentum call **before each new sub-task** so the topology is refreshed. The injection's effect is strongest at the start of a branch and weakens as turns accumulate; this is what reasoning decay means in practice and what re-injection counters.
+For multi-step workflows, place a fresh Ejentum call before each new sub-task. The injection's effect on the LLM's response is strongest at the start of a branch.
 
-The node is marked `usableAsTool: true`, so n8n's AI Agent can autonomously call any of the eight operations when its task description suggests one is needed. The operation descriptions are written for that routing decision.
+The node is `usableAsTool: true`, so n8n's AI Agent node can call any of the eight operations autonomously when the task description matches one of the operation triggers.
+
+## ejentum-mcp alternative
+
+n8n also ships an MCP Client node. The hosted MCP server at `https://api.ejentum.com/mcp` exposes the same eight tools with Bearer auth via your `EJENTUM_API_KEY`. Use this n8n node for tight n8n integration (credential vault, expression-friendly outputs, AI Agent routing); use the MCP route if you are already wiring multiple MCP servers into one workflow.
+
+## Compatibility
+
+- n8n 2.9.x and above
+- Node.js >= 20.15 on the n8n host
+- Tested via `eslint-plugin-n8n-nodes-base` community + prepublish rule sets
 
 ## Resources
 
 - Homepage: <https://ejentum.com>
 - Pricing: <https://ejentum.com/pricing>
 - API reference: <https://ejentum.com/docs/api_reference>
-- Positioning essay "Why LLM Agents Fail": <https://ejentum.com/blog/why-llm-agents-fail>
-- "Under Pressure" research paper (Zenodo): <https://doi.org/10.5281/zenodo.19392715>
-- n8n community nodes documentation: <https://docs.n8n.io/integrations/community-nodes/>
+- n8n community nodes: <https://docs.n8n.io/integrations/community-nodes/>
 
 ## License
 
