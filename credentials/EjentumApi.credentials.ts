@@ -27,7 +27,7 @@ export class EjentumApi implements ICredentialType {
 			displayName: 'API Base URL',
 			name: 'baseUrl',
 			type: 'string',
-			default: 'https://api.ejentum.com/harness',
+			default: 'https://api.ejentum.com/harness/',
 			description:
 				'Override only if you are self-hosting the Ejentum Logic API gateway. Leave the default for the managed service.',
 		},
