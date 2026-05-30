@@ -2,6 +2,8 @@
 
 An n8n community node that calls the Ejentum API and returns a task-matched cognitive operation (procedure + topology DAG + cognitive payload) for injection into the LLM step that follows.
 
+Use the node before the AI Agent step on complex, multi-step, or multi-constraint tasks where the downstream model's default reasoning template would miss a constraint, take a shortcut, or drift across turns. Each call returns a *cognitive operation*: a structured procedure (numbered steps with a failure pattern to refuse and a falsification test) paired with an executable reasoning topology (a DAG of those steps with decision gates, parallel branches, bounded loops, and meta-cognitive exit nodes). The downstream model reads both layers from `{{ $json.injection }}` in its system prompt before producing its response.
+
 One node, eight operations: four dynamic (`Reasoning`, `Code`, `Anti-Deception`, `Memory`) available on all tiers including the 30-day free trial, and four adaptive (`Adaptive Reasoning`, `Adaptive Code`, `Adaptive Anti-Deception`, `Adaptive Memory`) that run an additional adapter LLM step. Adaptive operations require the Go or Super tier.
 
 ## Install
