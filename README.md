@@ -82,23 +82,30 @@ Full wire contract, field structure of an injection, DAG syntax (token vocabular
 
 ## Canonical wiring
 
-```
-Webhook ─► Ejentum (Reasoning, query="{{ $json.task }}")
-            │
-            └─► AI Agent / OpenAI Chat / Anthropic / ...
-                  System prompt:
-                  """
-                  [REASONING CONTEXT]
-                  {{ $json.injection }}
-                  [END REASONING CONTEXT]
+Ejentum is an agentic tool, not a pre-processing step. Wire it to the **AI Agent** node's tool input and let the agent call it on demand, alongside your other tools:
 
-                  Now perform the task.
-                  """
+```
+Chat Trigger ─► AI Agent ─────────────────► (response)
+                  ├─ Chat Model: OpenAI / Anthropic / ...
+                  ├─ Memory (optional)
+                  └─ Tools
+                       ├─ Ejentum (Reasoning / Code / Anti-Deception / Memory, + adaptive)
+                       ├─ HTTP Request, Calculator, Vector Store, ...
 ```
 
-For multi-step workflows, place a fresh Ejentum call before each new sub-task. The injection's effect on the LLM's response is strongest at the start of a branch.
+The node is `usableAsTool: true`, so the AI Agent calls whichever Ejentum operation matches the sub-task it is reasoning about, mid-loop, the same way it calls any other tool. The returned injection (procedure, topology, suppression vectors, falsification test) shapes how the agent reasons before it acts. There is no manual prompt wiring: the agent decides when a task needs the harness.
 
-The node is `usableAsTool: true`, so n8n's AI Agent node can call any of the eight operations autonomously when the task description matches one of the operation triggers.
+**Alternative for non-agent pipelines.** In a deterministic flow with no AI Agent node, call Ejentum directly and inject its output into a downstream Chat Model's system prompt:
+
+```
+Trigger ─► Ejentum (query="{{ $json.task }}") ─► Chat Model
+           system prompt:
+           [REASONING CONTEXT]
+           {{ $json.injection }}
+           [END REASONING CONTEXT]
+```
+
+Place a fresh Ejentum call before each new sub-task; the injection's effect is strongest at the start of a branch.
 
 ## ejentum-mcp alternative
 

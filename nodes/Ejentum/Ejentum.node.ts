@@ -102,7 +102,7 @@ export class Ejentum implements INodeType {
 						value: 'reasoning',
 						action: 'Get reasoning harness',
 						description:
-							'Use before analytical, diagnostic, planning, or multi-step tasks across abstraction, time, causality, simulation, spatial, and metacognition.',
+							'Use before analytical, diagnostic, planning, or multi-step tasks across abstraction, time, causality, simulation, spatial, and metacognition',
 					},
 				],
 				default: 'reasoning',

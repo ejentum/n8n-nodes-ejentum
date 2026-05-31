@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-ejentum",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "n8n community node for the Ejentum Reasoning Harness. Eight operation modes: four dynamic (reasoning, code, anti-deception, memory) and four adaptive (adaptive-reasoning, adaptive-code, adaptive-anti-deception, adaptive-memory) that pre-fit the operation to your task via an adapter LLM. Each call retrieves a cognitive injection engineered in two layers: a natural-language procedure plus an executable reasoning topology. Injected before an LLM step to harden reasoning against decay.",
   "keywords": [
     "n8n-community-node-package",
