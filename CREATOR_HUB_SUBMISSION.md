@@ -35,7 +35,7 @@ Secondary: **Utility** / **Productivity**
 
 API Key (Bearer). The credential class is `Ejentum API` with two fields:
 - `apiKey` (required) — paste from <https://ejentum.com/pricing>
-- `baseUrl` (default `https://ejentum-main-ab125c3.zuplo.app/logicv1/`, override only for self-hosted)
+- `baseUrl` (default `https://api.ejentum.com/harness/`, override only for self-hosted)
 
 Credential includes a `test` request that hits the live gateway and confirms the key works.
 
@@ -51,7 +51,7 @@ Credential includes a `test` request that hits the live gateway and confirms the
 ## Resources
 
 - Documentation: <https://ejentum.com/docs/api_reference>
-- Pricing / free tier (100 calls, no card): <https://ejentum.com/pricing>
+- Pricing / free tier (30-day trial, 1,000 dynamic calls, no card): <https://ejentum.com/pricing>
 - n8n integration guide: <https://ejentum.com/docs/n8n_guide>
 - Positioning essay "Why LLM Agents Fail": <https://ejentum.com/blog/why-llm-agents-fail>
 - "Under Pressure" research paper: <https://doi.org/10.5281/zenodo.19392715>
